@@ -87,10 +87,10 @@ export function AdminPanel() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Admin Panel</h1>
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Admin Panel</h1>
           <p className="text-gray-400">Manage scoreboard participants</p>
         </div>
 
@@ -109,7 +109,7 @@ export function AdminPanel() {
         </button>
 
         {showForm && (
-          <div className="mb-8 bg-slate-700/50 border border-slate-600 rounded-lg p-6">
+          <div className="mb-8 bg-slate-700/50 border border-slate-600 rounded-lg p-4 md:p-6">
             <h2 className="text-xl font-bold text-white mb-4">
               {editingId ? 'Edit Participant' : 'Add New Participant'}
             </h2>
@@ -141,7 +141,8 @@ export function AdminPanel() {
 
               <div className="bg-slate-600/50 border border-slate-500 rounded p-4">
                 <h3 className="text-sm font-semibold text-white mb-3">Scores</h3>
-                <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+                {/* Responsive grid for scores - 2 columns on mobile, 5 on desktop */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                   {(['round1', 'round2', 'round3', 'round4', 'round5'] as const).map(round => (
                     <div key={round}>
                       <label className="block text-xs font-medium text-gray-300 mb-1">
@@ -161,18 +162,18 @@ export function AdminPanel() {
                 </div>
               </div>
 
-              <div className="flex gap-2 justify-end">
+              <div className="flex flex-col sm:flex-row gap-2 justify-end">
                 <button
                   type="button"
                   onClick={handleCloseForm}
-                  className="flex items-center gap-2 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-slate-600 hover:bg-slate-500 text-white rounded-lg transition-colors"
                 >
                   <X className="w-4 h-4" />
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
+                  className="flex items-center justify-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors"
                 >
                   <Save className="w-4 h-4" />
                   {editingId ? 'Update' : 'Add'} Participant
@@ -187,20 +188,21 @@ export function AdminPanel() {
             <p className="text-gray-400">Loading participants...</p>
           </div>
         ) : (
+          // Added horizontal scrolling for mobile
           <div className="bg-slate-700/50 border border-slate-600 rounded-lg overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm min-w-[800px] md:min-w-0">
               <thead>
                 <tr className="border-b border-slate-600">
-                  <th className="px-4 py-3 text-left text-gray-300 font-semibold">Rank</th>
-                  <th className="px-4 py-3 text-left text-gray-300 font-semibold">Name</th>
-                  <th className="px-4 py-3 text-left text-gray-300 font-semibold">College</th>
-                  <th className="px-4 py-3 text-center text-gray-300 font-semibold">R1</th>
-                  <th className="px-4 py-3 text-center text-gray-300 font-semibold">R2</th>
-                  <th className="px-4 py-3 text-center text-gray-300 font-semibold">R3</th>
-                  <th className="px-4 py-3 text-center text-gray-300 font-semibold">R4</th>
-                  <th className="px-4 py-3 text-center text-gray-300 font-semibold">R5</th>
-                  <th className="px-4 py-3 text-center text-gray-300 font-semibold">Total</th>
-                  <th className="px-4 py-3 text-center text-gray-300 font-semibold">Actions</th>
+                  <th className="px-4 py-3 text-left text-gray-300 font-semibold w-[50px]">Rank</th>
+                  <th className="px-4 py-3 text-left text-gray-300 font-semibold min-w-[120px]">Name</th>
+                  <th className="px-4 py-3 text-left text-gray-300 font-semibold min-w-[120px]">College</th>
+                  <th className="px-4 py-3 text-center text-gray-300 font-semibold w-[50px]">R1</th>
+                  <th className="px-4 py-3 text-center text-gray-300 font-semibold w-[50px]">R2</th>
+                  <th className="px-4 py-3 text-center text-gray-300 font-semibold w-[50px]">R3</th>
+                  <th className="px-4 py-3 text-center text-gray-300 font-semibold w-[50px]">R4</th>
+                  <th className="px-4 py-3 text-center text-gray-300 font-semibold w-[50px]">R5</th>
+                  <th className="px-4 py-3 text-center text-gray-300 font-semibold w-[70px]">Total</th>
+                  <th className="px-4 py-3 text-center text-gray-300 font-semibold w-[100px]">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -211,40 +213,37 @@ export function AdminPanel() {
                     </td>
                   </tr>
                 ) : (
-                  participants.map((participant, index) => {
-                    const total = participant.round1 + participant.round2 + participant.round3 + participant.round4 + participant.round5;
-                    return (
-                      <tr key={participant.id} className={index % 2 === 0 ? 'bg-slate-600/30' : ''}>
-                        <td className="px-4 py-3 text-gray-200">{participant.rank}</td>
-                        <td className="px-4 py-3 text-gray-200">{participant.name}</td>
-                        <td className="px-4 py-3 text-gray-400">{participant.college}</td>
-                        <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round1)}</td>
-                        <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round2)}</td>
-                        <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round3)}</td>
-                        <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round4)}</td>
-                        <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round5)}</td>
-                        <td className="px-4 py-3 text-center font-bold text-blue-300">{formatScore(total)}</td>
-                        <td className="px-4 py-3 text-center">
-                          <div className="flex gap-2 justify-center">
-                            <button
-                              onClick={() => handleOpenForm(participant)}
-                              className="p-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors"
-                              title="Edit"
-                            >
-                              <Edit2 className="w-4 h-4" />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(participant.id)}
-                              className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
-                              title="Delete"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
+                  participants.map((participant, index) => (
+                    <tr key={participant.id} className={index % 2 === 0 ? 'bg-slate-600/30' : ''}>
+                      <td className="px-4 py-3 text-gray-200">{participant.rank}</td>
+                      <td className="px-4 py-3 text-gray-200">{participant.name}</td>
+                      <td className="px-4 py-3 text-gray-400">{participant.college}</td>
+                      <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round1)}</td>
+                      <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round2)}</td>
+                      <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round3)}</td>
+                      <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round4)}</td>
+                      <td className="px-4 py-3 text-center text-gray-200">{formatScore(participant.round5)}</td>
+                      <td className="px-4 py-3 text-center font-bold text-blue-300">{formatScore(participant.total_score)}</td>
+                      <td className="px-4 py-3 text-center">
+                        <div className="flex gap-2 justify-center">
+                          <button
+                            onClick={() => handleOpenForm(participant)}
+                            className="p-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded transition-colors"
+                            title="Edit"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(participant.id)}
+                            className="p-1.5 bg-red-600 hover:bg-red-700 text-white rounded transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
                 )}
               </tbody>
             </table>

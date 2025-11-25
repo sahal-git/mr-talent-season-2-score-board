@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
 import { supabase, Participant, ParticipantInput } from '../lib/supabase';
 
+// Helper function to calculate total score
+const calculateTotalScore = (participant: Partial<Participant>): number => {
+  return (
+    (participant.round1 || 0) +
+    (participant.round2 || 0) +
+    (participant.round3 || 0) +
+    (participant.round4 || 0) +
+    (participant.round5 || 0)
+  );
+};
+
 export function useParticipants() {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(true);
@@ -38,12 +49,77 @@ export function useParticipants() {
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'INSERT',
           schema: 'public',
           table: 'scoreboard_participants'
         },
-        () => {
-          fetchParticipants();
+        (payload) => {
+          // Add the new participant and re-sort
+          const newParticipantData = payload.new as Participant;
+          const newParticipant = {
+            ...newParticipantData,
+            total_score: calculateTotalScore(newParticipantData),
+            rank: 0 // Will be recalculated
+          };
+          
+          setParticipants(prev => {
+            const updated = [...prev, newParticipant];
+            // Sort by total_score descending
+            updated.sort((a, b) => b.total_score - a.total_score);
+            // Recalculate ranks
+            return updated.map((p, index) => ({
+              ...p,
+              rank: index + 1
+            }));
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'scoreboard_participants'
+        },
+        (payload) => {
+          // Update the participant and re-sort
+          const updatedParticipantData = payload.new as Participant;
+          const updatedParticipant = {
+            ...updatedParticipantData,
+            total_score: calculateTotalScore(updatedParticipantData)
+          };
+          
+          setParticipants(prev => {
+            const updated = prev.map(p => 
+              p.id === updatedParticipant.id ? updatedParticipant : p
+            );
+            // Sort by total_score descending
+            updated.sort((a, b) => b.total_score - a.total_score);
+            // Recalculate ranks
+            return updated.map((p, index) => ({
+              ...p,
+              rank: index + 1
+            }));
+          });
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'DELETE',
+          schema: 'public',
+          table: 'scoreboard_participants'
+        },
+        (payload) => {
+          // Remove the participant and re-sort
+          setParticipants(prev => {
+            const updated = prev.filter(p => p.id !== payload.old.id);
+            // Recalculate ranks
+            return updated.map((p, index) => ({
+              ...p,
+              rank: index + 1
+            }));
+          });
         }
       )
       .subscribe();
@@ -60,7 +136,7 @@ export function useParticipants() {
         .insert([data]);
 
       if (err) throw err;
-      await fetchParticipants();
+      // No need to manually refetch - real-time subscription will handle it
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to add participant');
@@ -76,7 +152,7 @@ export function useParticipants() {
         .eq('id', id);
 
       if (err) throw err;
-      await fetchParticipants();
+      // No need to manually refetch - real-time subscription will handle it
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update participant');
@@ -92,7 +168,7 @@ export function useParticipants() {
         .eq('id', id);
 
       if (err) throw err;
-      await fetchParticipants();
+      // No need to manually refetch - real-time subscription will handle it
       return true;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete participant');
