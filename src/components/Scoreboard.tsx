@@ -32,6 +32,25 @@ export function Scoreboard() {
       </div>
 
       <div className="flex-1 flex flex-col p-4 overflow-hidden">
+        {/* Mobile header with logo */}
+        <div className="md:hidden flex flex-col items-center mb-3">
+          <div className="flex items-center justify-center mb-2">
+            <img
+              src="/Untitled-1 (1).png"
+              alt="Mr Talent Logo"
+              className="h-16 w-auto object-contain"
+            />
+          </div>
+          <div className="text-center">
+            <p className="text-white text-xs uppercase tracking-widest opacity-70 mb-1">
+              CP MOIDEEN HAJI MEMORIAL
+            </p>
+            <p className="text-white text-xs uppercase tracking-widest opacity-80">
+              SEASON 02
+            </p>
+          </div>
+        </div>
+
         {/* Header with mobile-friendly title */}
         <h2 className="text-2xl md:text-3xl font-bold text-white uppercase tracking-widest text-center mb-3 flex-shrink-0">
           Scoreboard
